@@ -1,0 +1,10 @@
+<library path="soem_hardware_interface">
+    <class name="soem_hardware_interface/SoemHWInterface"
+           type="soem_hardware_interface::SoemHWInterface"
+           base_class_type="hardware_interface::SystemInterface">
+
+        <description>
+            Hardware interface with Simple Open EtherCAT Master (SOEM) 
+        </description>
+    </class>
+</library>

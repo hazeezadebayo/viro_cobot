@@ -1,0 +1,6 @@
+admittance_node:
+  ros__parameters:
+    base_link: "base_link"
+    end_effector: "gripper_tcp" # "link_6"
+    joint_names: ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
+    wrench_topic: "/cobot/wrist_ft"

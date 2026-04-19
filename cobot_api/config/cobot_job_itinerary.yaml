@@ -1,0 +1,39 @@
+cobot_job_client:
+  ros__parameters:
+
+    goal_program: [
+      "1_movej",
+      "2_movej",
+    ]
+
+    1_movej: [-3.12, 0.0, 1.57, 0.0, 0.0, 0.0] 
+    2_movej: [3.12, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+
+
+
+
+# -----------------------------------------------------------------------------------
+# JOB program goals demo sample yaml content:
+# cobot_job_client:
+#   ros__parameters:
+
+#     goal_program: [
+#       "1_movej",
+#       "2_movej",
+#       "3_movel",
+#       "4_wait",
+#       "5_gripper",
+#     ]
+
+#     1_movej: [j1, j2, j3, j4, j5, j6] 
+#     2_movej: [j1, j2, j3, j4, j5, j6]
+#     3_movel: [x, y, z, qx, qy, qz, qw]
+#     4_wait: [seconds]
+#     5_gripper: [1.0 or 0.0]
+# -----------------------------------------------------------------------------------
+
+
+
+
+

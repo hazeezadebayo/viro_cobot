@@ -1,0 +1,336 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:macro name="cobot_ros2_control" params="
+    use_fake_hardware:=false
+    sim_gazebo:=false
+    use_soem:=false
+    initial_mode_of_operation:=8
+    ">
+
+    <!-- Gazebo Colors -->
+
+    <gazebo reference="base_link">
+      <material>Gazebo/SkyBlue</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+      <gravity>true</gravity>
+    </gazebo>
+    <gazebo reference="link_1">
+      <material>Gazebo/Gray</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="link_2">
+      <material>Gazebo/Gray</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="link_3">
+      <material>Gazebo/Gray</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="link_4">
+      <material>Gazebo/Gray</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="link_5">
+      <material>Gazebo/Gray</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="link_6">
+      <material>Gazebo/SkyBlue</material>
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <selfCollide>true</selfCollide>
+    </gazebo>
+
+
+    <!-- gazebo joint_States Plugin -->
+    <!-- <gazebo>
+        <plugin name="gazebo_ros_joint_state_publisher"
+            filename="libgazebo_ros_joint_state_publisher.so">
+            <update_rate>0</update_rate>
+            <joint_name>joint_1</joint_name>
+            <joint_name>joint_2</joint_name>
+            <joint_name>joint_3</joint_name>
+            <joint_name>joint_4</joint_name>
+            <joint_name>joint_5</joint_name>
+            <joint_name>joint_6</joint_name>
+        </plugin>
+    </gazebo> -->
+
+    <gazebo>
+      <plugin filename="ignition-gazebo6-forcetorque-system" name="ignition::gazebo::systems::ForceTorque">
+      </plugin>
+    </gazebo>
+ 
+    <gazebo reference="joint_6">
+      <sensor name="wrist_ft_sensor" type="force_torque">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>true</visualize>
+        <topic>cobot/wrist_ft_raw</topic>
+        <force_torque>
+          <frame>child</frame>
+          <measure_direction>child_to_parent</measure_direction>
+        </force_torque>
+      </sensor>
+    </gazebo>
+
+    <!-- ........................... CAMERA SENSOR (Ignition) ......................... -->
+    <gazebo reference="camera_mount_link">
+      <sensor name="kinect_camera" type="rgbd_camera">
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>10</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <topic>kinect_camera</topic>
+        <ignition_frame_id>kinect_camera_optical</ignition_frame_id>
+      </sensor>
+    </gazebo>
+    <!-- .......................................................................... -->
+
+    <!-- gazebo ROS2 Control Plugin -->
+
+    <xacro:if value="${sim_gazebo}">
+      <gazebo>
+        <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+          <parameters>$(find cobot_description)/config/cobot_controllers.yaml</parameters>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+
+
+
+    <!-- ROS2 Hardware Interface Cobot_Hardware_Interface -->
+
+    <ros2_control name="ethercat_zeroerr" type="system">
+
+      <hardware>
+        <xacro:if value="${sim_gazebo}">
+          <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </xacro:if>
+
+        <xacro:if value="${use_fake_hardware}">
+          <plugin>mock_components/GenericSystem</plugin>
+          <param name="calculate_dynamics">true</param>
+        </xacro:if>
+
+        <xacro:if value="${use_soem}">
+          <plugin>soem_hardware_interface/SoemHWInterface</plugin>
+          <param name="master_id">0</param>
+          <param name="control_frequency">1000</param>
+        </xacro:if>
+
+        <xacro:if value="${not (sim_gazebo or use_fake_hardware or use_soem)}">
+          <plugin>ethercat_driver/EthercatDriver</plugin>
+          <param name="master_id">0</param>
+          <param name="control_frequency">1000</param>
+        </xacro:if>
+      </hardware>
+
+
+      <joint name="joint_1">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">0</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+
+      <joint name="joint_2">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">1</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+
+
+      <joint name="joint_3">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">2</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+
+      <joint name="joint_4">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">3</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+
+      <joint name="joint_5">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">4</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+
+      <joint name="joint_6">
+        <command_interface name="reset_fault"/>
+        <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
+          <command_interface name="position">
+            <param name="min">-3.14</param>
+            <param name="max">3.14</param>
+          </command_interface>
+        </xacro:if>
+        <xacro:if value="${initial_mode_of_operation == 10 or initial_mode_of_operation == '10'}">
+          <command_interface name="effort"/>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware or sim_gazebo or use_soem}">
+          <ec_module name="ZeroErr">
+            <plugin>ethercat_generic_plugins/EcCiA402Drive</plugin>
+            <param name="alias">0</param>
+            <param name="position">5</param>
+            <param name="mode_of_operation">${initial_mode_of_operation}</param>
+            <param name="slave_config">$(find cobot_description)/config/zeroerr_config.yaml</param>
+          </ec_module>
+        </xacro:unless>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+        <param name="initial_position">0.0</param>
+      </joint>
+
+      <!-- Gripper Joints -->
+      <joint name="gripper_finger_left_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="gripper_finger_right_joint">
+        <param name="mimic">gripper_finger_left_joint</param>
+        <param name="multiplier">1.0</param>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+
+    </ros2_control>
+
+
+  </xacro:macro>
+</robot>

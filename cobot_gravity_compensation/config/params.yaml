@@ -1,0 +1,13 @@
+gravity_comp_node:
+  ros__parameters:
+    base_link: "base_link"
+    end_effector: "gripper_tcp" # "link_6"
+    joint_names: ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
+    torque_command_topic: "/gravity/effort"
+    friction:
+      joint_1: { f_v: 0.1, f_c: 0.5, f_s: 0.2, f_1: 1.0, f_2: 1.0 }
+      joint_2: { f_v: 0.1, f_c: 0.5, f_s: 0.2, f_1: 1.0, f_2: 1.0 }
+      joint_3: { f_v: 0.1, f_c: 0.5, f_s: 0.2, f_1: 1.0, f_2: 1.0 }
+      joint_4: { f_v: 0.05, f_c: 0.2, f_s: 0.1, f_1: 1.0, f_2: 1.0 }
+      joint_5: { f_v: 0.05, f_c: 0.2, f_s: 0.1, f_1: 1.0, f_2: 1.0 }
+      joint_6: { f_v: 0.05, f_c: 0.2, f_s: 0.1, f_1: 1.0, f_2: 1.0 }

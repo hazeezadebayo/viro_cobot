@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:macro name="cobot_transmissions">
+
+    <transmission name="joint_1_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_1_motor" role="joint_1_motor" />
+      <joint name="joint_1" role="joint_1">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+    <transmission name="joint_2_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_2_motor" role="joint_2_motor" />
+      <joint name="joint_2" role="joint_2">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+    <transmission name="joint_3_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_3_motor" role="joint_3_motor" />
+      <joint name="joint_3" role="joint_3">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+    <transmission name="joint_4_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_4_motor" role="joint_4_motor" />
+      <joint name="joint_4" role="joint_4">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+    <transmission name="joint_5_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_5_motor" role="joint_5_motor" />
+      <joint name="joint_5" role="joint_5">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+    <transmission name="joint_6_trans">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="joint_6_motor" role="joint_6_motor" />
+      <joint name="joint_6" role="joint_6">
+        <mechanical_reduction>1.0</mechanical_reduction>
+      </joint>
+    </transmission>
+
+  </xacro:macro>
+</robot>

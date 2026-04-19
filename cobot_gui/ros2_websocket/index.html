@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <title>"RD"</title>
+    <script type="text/javascript" src="node_modules/roslib/build/roslib.min.js"></script>
+    <script type="text/javascript" src="ros_demo.js"></script>
+    <script type="module" src="src/index.js"></script>
+    <style>
+      #robot_view {
+        width: 500px; /* Adjust as needed */
+        height: 500px; /* Adjust as needed */
+        border: 1px solid black; /* Optional, for visibility */
+      }
+      .container {
+        display: flex;
+        justify-content: space-between;
+      }
+      .left, .right {
+        width: 20%; /* Adjust as needed */
+      }
+      .center {
+        width: 50%; /* Adjust as needed */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .bottom {
+        margin-top: 20px; /* Adjust as needed */
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <h1>RDstudy demo</h1>
+
+    <p>welcome:</p>
+    <ul>
+      <li> connection at <code>http://0.0.0.0:8080/</code></li>
+      <li> checkout my other github projects at <code><a href="https://github.com/hazeezadebayo/" target="_blank">hazeezadebayo</a></code>.</li>
+    </ul>
+
+    <hr/>
+
+    <p>Connection: <span id="status" style="font-weight: bold;">N/A</span></p>
+
+    <!-- <p><code>message sent:</code> <ul id="messages" style="font-weight: bold;"></ul></p> -->
+    <p><code>Command:</code> <span id="messages" style="font-weight: bold;"></span></p>
+    <p><code>Feedback:</code> <span id="joint_values" style="font-weight: bold;"></span></p>
+
+    <div class="container">
+
+    <!-- left section -->
+    <div class="left">
+      <h2>Joint<br>Jogging</h2>
+      <div>
+        <button onclick="sendMessage({ joint: -1})">J1-</button>
+        <button onclick="sendMessage({ joint: +1})">J1+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ joint: -2 })">J2-</button>
+        <button onclick="sendMessage({ joint: +2})">J2+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ joint: -3 })">J3-</button>
+        <button onclick="sendMessage({ joint: +3})">J3+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ joint: -4 })">J4-</button>
+        <button onclick="sendMessage({ joint: +4})">J4+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ joint: -5 })">J5-</button>
+        <button onclick="sendMessage({ joint: +5})">J5+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ joint: -6 })">J6-</button>
+        <button onclick="sendMessage({ joint: +6})">J6+</button>
+      </div>
+    </div>
+
+    <!-- center section -->
+    <div class="center">
+      <!-- robot display -->
+      <div id="robot_view"></div>
+    </div>
+
+    <!-- right section -->
+    <div class="right">
+      <h2>Cartesian<br>Jogging</h2>
+      <div>
+        <button onclick="sendMessage({ cartesian: -1 })">X-</button>
+        <button onclick="sendMessage({ cartesian: +1 })">X+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ cartesian: -2 })">Y-</button>
+        <button onclick="sendMessage({ cartesian: +2 })">Y+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ cartesian: -3 })">Z-</button>
+        <button onclick="sendMessage({ cartesian: +3 })">Z+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ cartesian: -4 })">RX-</button>
+        <button onclick="sendMessage({ cartesian: +4 })">RX+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ cartesian: -5 })">RY-</button>
+        <button onclick="sendMessage({ cartesian: +5 })">RY+</button>
+      </div>
+      <div>
+        <button onclick="sendMessage({ cartesian: -6 })">RZ-</button>
+        <button onclick="sendMessage({ cartesian: +6 })">RZ+</button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- bottom section -->
+  <div class="bottom">
+    <div style="display: flex; justify-content: space-between;">
+      <!-- Left div for Power buttons -->
+      <div>
+        <h2>Power Control</h2>
+        <div style="margin-bottom: 10px;">
+          <label for="run_mode">Mode:</label>
+          <select id="run_mode" style="padding: 5px; border-radius: 4px;">
+            <option value="simulation">Simulation (Gazebo)</option>
+            <option value="headless">Headless (Fake)</option>
+            <option value="real_ethercat">Real Robot (Ethercat)</option>
+            <option value="real_soem">Real Robot (SOEM)</option>
+            <option value="free_mode">Free Mode (Effort Interaction)</option>
+          </select>
+        </div>
+        <!-- Buttons for Power On/Off -->
+        <button onclick="sendMessage({power: '1,' + document.getElementById('run_mode').value})" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Power On</button>
+        <button onclick="sendMessage({power: 0})" style="padding: 8px 15px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Power Off</button>
+      </div>
+      <!-- Center div for Speed/Sensitivity Control -->
+      <div>
+        <h2>Speed Control</h2>
+        <!-- Slider for Speed Control -->
+        <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" onchange="sendSpeed({ speed_val: parseFloat(this.value) })">
+      </div>
+      <!-- Right div for Stop/Home buttons -->
+      <div>
+        <h2>Stop/Home</h2>
+        <!-- Stop and Home buttons -->
+        <button onclick="sendMessage({ stop: 1 })">Stop</button>
+        <button onclick="sendMessage({ home: 1 })">Home</button>
+      </div>
+    </div>
+    
+    <!-- Virtual Force Injection -->
+    <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+      <h2 style="margin-top: 0;">Virtual Force Injection (End-Effector)</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
+        <div><label>Fx(N):</label><input type="number" id="fext_x" value="0.0" step="0.1" style="width: 60px;"></div>
+        <div><label>Fy(N):</label><input type="number" id="fext_y" value="0.0" step="0.1" style="width: 60px;"></div>
+        <div><label>Fz(N):</label><input type="number" id="fext_z" value="0.0" step="0.1" style="width: 60px;"></div>
+        <div><label>Tx(Nm):</label><input type="number" id="fext_tx" value="0.0" step="0.1" style="width: 60px;"></div>
+        <div><label>Ty(Nm):</label><input type="number" id="fext_ty" value="0.0" step="0.1" style="width: 60px;"></div>
+        <div><label>Tz(Nm):</label><input type="number" id="fext_tz" value="0.0" step="0.1" style="width: 60px;"></div>
+      </div>
+      <button 
+        onmousedown="sendManualWrench(false)" 
+        onmouseup="sendManualWrench(true)" 
+        ontouchstart="sendManualWrench(false)" 
+        ontouchend="sendManualWrench(true)"
+        style="padding: 10px 20px; background-color: #673AB7; color: white; border: none; border-radius: 4px; cursor: pointer; user-select: none;">
+        Push Robot (Hold)
+      </button>
+    </div>
+  </div>
+
+  </body>
+</html>

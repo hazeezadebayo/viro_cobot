@@ -1,0 +1,26 @@
+services:
+  viro_cobot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - USER_UID=${USER_UID:-1000}
+        - USER_GID=${USER_GID:-1000}
+        - USERNAME=${USERNAME:-robot}
+    image: viro_cobot_env:latest
+    container_name: viro_cobot_container
+    network_mode: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY:-:0.0}
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ..:/ros2_ws/src/viro_cobot
+      # Optional: Mapping EtherCAT master device if present on host
+      # - /dev/EtherCAT0:/dev/EtherCAT0:rw
+    working_dir: /ros2_ws
+    stdin_open: true
+    tty: true
+    command: /bin/bash

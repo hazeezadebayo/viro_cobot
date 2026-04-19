@@ -1,0 +1,37 @@
+# ROS 2 build/install/log
+build/
+install/
+log/
+
+# Python junk
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# IDE junk
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Binary blobs (meshes are small enough to keep, but we avoid potential large ones)
+# *.stl  <-- We decided to keep UR5 meshes (~14MB)
+
+# Project Specific Ignores (User requested)
+v0_README.md
+output_log.md
+project_report.md

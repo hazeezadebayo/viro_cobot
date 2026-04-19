@@ -1,0 +1,13 @@
+string[] name
+float64[] position
+float64[] velocity
+float64[] effort
+float64[] wrench
+float64[] mx  
+float64[] dx
+float64[] kx
+float64[] mr
+float64[] dr
+float64[] kr
+int8 safety_mode
+int8 ctrl_mode
