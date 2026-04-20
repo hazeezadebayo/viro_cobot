@@ -1,0 +1,10 @@
+<library path="cobot_hardware">
+  <class name="cobot_hardware/ViroHardware"
+         type="cobot_hardware::ViroHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Professional Viro Cobot Hardware Interface.
+      Implements full lifecycle and handles daisy-chained serial joints.
+    </description>
+  </class>
+</library>

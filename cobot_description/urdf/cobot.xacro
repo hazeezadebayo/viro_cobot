@@ -6,6 +6,7 @@
    <xacro:arg name="use_fake_hardware" default="false" />
    <xacro:arg name="sim_gazebo" default="false" />
    <xacro:arg name="use_soem" default="false" />
+   <xacro:arg name="use_modular_hardware" default="false" />
    <xacro:arg name="initial_mode_of_operation" default="8" />
    <xacro:include filename="$(find cobot_description)/urdf/cobot_arm.xacro"/>
    <xacro:include filename="$(find cobot_description)/urdf/cobot_transmissions.xacro"/>
@@ -21,6 +22,12 @@
          </geometry>
          <material name="blue"/>
       </visual>
+      <collision>
+         <origin xyz="0 0 0" rpy="0 0 0"/>
+         <geometry>
+            <box size="0.02 0.02 0.02"/>
+         </geometry>
+      </collision>
       <inertial>
          <mass value="0.001"/>
          <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -56,6 +63,7 @@
       use_fake_hardware="$(arg use_fake_hardware)"
       sim_gazebo="$(arg sim_gazebo)"
       use_soem="$(arg use_soem)"
+      use_modular_hardware="$(arg use_modular_hardware)"
       initial_mode_of_operation="$(arg initial_mode_of_operation)" />
 
 </robot>

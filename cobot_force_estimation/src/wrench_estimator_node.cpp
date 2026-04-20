@@ -65,7 +65,7 @@ private:
             this->get_parameter("base_link").as_string(), 
             this->get_parameter("end_effector").as_string());
         
-        joint_names_ = msg->name;
+        joint_names_ = estimator_->get_joint_names();
         nj_ = joint_names_.size();
         filtered_wrench_.setZero();
     }
@@ -74,10 +74,20 @@ private:
     Eigen::VectorXd qd(nj_);
     Eigen::VectorXd tau(nj_);
 
+    // Robust mapping by name
     for (size_t i = 0; i < nj_; ++i) {
-        q(i) = msg->position[i];
-        qd(i) = msg->velocity[i];
-        tau(i) = msg->effort[i];
+        auto it = std::find(msg->name.begin(), msg->name.end(), joint_names_[i]);
+        if (it != msg->name.end()) {
+            size_t idx = std::distance(msg->name.begin(), it);
+            q(i) = msg->position[idx];
+            qd(i) = msg->velocity[idx];
+            tau(i) = msg->effort[idx];
+        } else {
+            RCLCPP_WARN_ONCE(this->get_logger(), "Joint %s not found in JointState message!", joint_names_[i].c_str());
+            q(i) = 0.0;
+            qd(i) = 0.0;
+            tau(i) = 0.0;
+        }
     }
 
     // Estimate Wrench

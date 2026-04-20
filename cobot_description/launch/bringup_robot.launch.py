@@ -19,6 +19,8 @@ def generate_launch_description():
 
     rviz_arg = DeclareLaunchArgument("rviz_gui", default_value="false",
                                        description="Flag to enable rviz")
+    use_modular_arg = DeclareLaunchArgument("use_modular_hardware", default_value="false",
+                                             description="Use Viro Modular Serial Hardware")
 
     # current package path
     pkg_share_path = get_package_share_directory("cobot_description")
@@ -38,9 +40,11 @@ def generate_launch_description():
             " ",
             "name:=cobot_arm",
             " ",
-            "use_fake_hardware:=true",
+            "use_fake_hardware:=false",
             " ",
-            "sim_gazebo:=false"
+            "sim_gazebo:=false",
+            " ",
+            "use_modular_hardware:=", LaunchConfiguration("use_modular_hardware")
         ]
     )
 
@@ -117,11 +121,25 @@ def generate_launch_description():
         ]
     )
 
+    wrist_ft_sensor_broadcaster = Node(
+        name="wrist_ft_sensor_broadcaster",
+        package="controller_manager",
+        executable="spawner",
+        output="screen",
+        arguments=[
+            "wrist_ft_sensor_broadcaster",
+            "--controller-manager",
+            "/controller_manager"       
+        ],
+        condition=IfCondition(LaunchConfiguration("use_modular_hardware"))
+    )
+
     # Return Launch Function -------------------------------------------------
 
     return LaunchDescription(
         [
             rviz_arg,
+            use_modular_arg,
             rviz_node,
             robot_state_publisher_node,
             
@@ -132,5 +150,6 @@ def generate_launch_description():
 
             joint_state_broadcaster,
             joint_trajectory_controller,
+            wrist_ft_sensor_broadcaster,
         ]
     )

@@ -6,6 +6,7 @@
     use_fake_hardware:=false
     sim_gazebo:=false
     use_soem:=false
+    use_modular_hardware:=false
     initial_mode_of_operation:=8
     ">
 
@@ -116,7 +117,7 @@
 
     <xacro:if value="${sim_gazebo}">
       <gazebo>
-        <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
           <parameters>$(find cobot_description)/config/cobot_controllers.yaml</parameters>
         </plugin>
       </gazebo>
@@ -145,7 +146,22 @@
           <param name="control_frequency">1000</param>
         </xacro:if>
 
-        <xacro:if value="${not (sim_gazebo or use_fake_hardware or use_soem)}">
+        <xacro:if value="${use_modular_hardware}">
+          <plugin>cobot_hardware/ViroHardware</plugin>
+          <param name="port">/tmp/ttyViro</param>
+          <param name="baud">115200</param>
+
+          <sensor name="wrist_ft_sensor">
+            <state_interface name="force.x"/>
+            <state_interface name="force.y"/>
+            <state_interface name="force.z"/>
+            <state_interface name="torque.x"/>
+            <state_interface name="torque.y"/>
+            <state_interface name="torque.z"/>
+          </sensor>
+        </xacro:if>
+
+        <xacro:if value="${not (sim_gazebo or use_fake_hardware or use_soem or use_modular_hardware)}">
           <plugin>ethercat_driver/EthercatDriver</plugin>
           <param name="master_id">0</param>
           <param name="control_frequency">1000</param>
@@ -155,6 +171,10 @@
 
       <joint name="joint_1">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">1</param>
+        </xacro:if>
+
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>
@@ -182,6 +202,9 @@
 
       <joint name="joint_2">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">2</param>
+        </xacro:if>
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>
@@ -210,6 +233,9 @@
 
       <joint name="joint_3">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">3</param>
+        </xacro:if>
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>
@@ -237,6 +263,9 @@
 
       <joint name="joint_4">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">4</param>
+        </xacro:if>
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>
@@ -264,6 +293,9 @@
 
       <joint name="joint_5">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">5</param>
+        </xacro:if>
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>
@@ -291,6 +323,9 @@
 
       <joint name="joint_6">
         <command_interface name="reset_fault"/>
+        <xacro:if value="${use_modular_hardware}">
+          <param name="node_id">6</param>
+        </xacro:if>
         <xacro:if value="${initial_mode_of_operation == 8 or initial_mode_of_operation == '8'}">
           <command_interface name="position">
             <param name="min">-3.14</param>

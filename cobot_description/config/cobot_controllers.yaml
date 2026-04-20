@@ -15,6 +15,9 @@ controller_manager:
     gripper_controller:
       type: "joint_trajectory_controller/JointTrajectoryController"
 
+    wrist_ft_sensor_broadcaster:
+      type: "force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster"
+
 
 
 
@@ -117,3 +120,10 @@ gripper_controller:
       stopped_velocity_tolerance: 0.0
       goal_time: 0.0
     use_sim_time: true
+
+
+# if we have a real robot HW and want to publish FT
+wrist_ft_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: wrist_ft_sensor
+    frame_id: link_6

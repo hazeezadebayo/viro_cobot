@@ -5,13 +5,13 @@
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1.0</real_time_factor>
     </physics>
-    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics" />
-    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands" />
-    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster" />
-    <plugin filename="ignition-gazebo-contact-system" name="ignition::gazebo::systems::Contact" />
-    <plugin filename="ignition-gazebo-apply-link-wrench-system" name="ignition::gazebo::systems::ApplyLinkWrench" />
-    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors" />
-    <plugin filename="ignition-gazebo-forcetorque-system" name="ignition::gazebo::systems::ForceTorque" />
+    <plugin filename="ignition-gazebo6-physics-system" name="ignition::gazebo::systems::Physics" />
+    <plugin filename="ignition-gazebo6-user-commands-system" name="ignition::gazebo::systems::UserCommands" />
+    <plugin filename="ignition-gazebo6-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster" />
+    <plugin filename="ignition-gazebo6-contact-system" name="ignition::gazebo::systems::Contact" />
+    <plugin filename="ignition-gazebo6-apply-link-wrench-system" name="ignition::gazebo::systems::ApplyLinkWrench" />
+    <plugin filename="ignition-gazebo6-sensors-system" name="ignition::gazebo::systems::Sensors" />
+    <plugin filename="ignition-gazebo6-forcetorque-system" name="ignition::gazebo::systems::ForceTorque" />
 
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>

@@ -37,6 +37,11 @@ public:
     const Eigen::VectorXd & qd,
     const Eigen::VectorXd & tau_meas);
 
+  /**
+   * @brief Get the joint names present in the KDL chain.
+   */
+  std::vector<std::string> get_joint_names() const;
+
 private:
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainJntToJacSolver> jac_solver_;

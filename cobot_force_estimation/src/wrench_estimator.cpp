@@ -59,4 +59,16 @@ Eigen::Vector6d WrenchEstimator::estimate_wrench(
   return wrench;
 }
 
+std::vector<std::string> WrenchEstimator::get_joint_names() const
+{
+  std::vector<std::string> names;
+  for (size_t i = 0; i < chain_.getNrOfSegments(); ++i) {
+    const KDL::Joint & joint = chain_.getSegment(i).getJoint();
+    if (joint.getType() != KDL::Joint::None) {
+      names.push_back(joint.getName());
+    }
+  }
+  return names;
+}
+
 }  // namespace cobot_force_estimation

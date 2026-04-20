@@ -77,6 +77,14 @@ class MySubscriber(Node):
         cmd_str = self.command
         self.command = None # Clear immediately
         
+        # Reap any finished subprocesses (zombie cleanup)
+        try:
+            while True:
+                pid, status = os.waitpid(-1, os.WNOHANG)
+                if pid == 0: break
+        except OSError:
+            pass
+
         try:
             if ',' in cmd_str:
                 parts = cmd_str.split(',')
@@ -99,10 +107,14 @@ class MySubscriber(Node):
                         control_mode = "effort" if mode == "free_mode" else "position"
                         enable_interaction = "true" if mode == "free_mode" else "false"
 
+                        # Get absolute path to world for container
+                        world_path = "/ros2_ws/install/cobot_description/share/cobot_description/worlds/empty.world"
+
                         launch_cmd = f"source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && \
                             ros2 launch cobot_api system.launch.py sim_gazebo:={sim_gazebo} \
                             use_fake_hardware:={use_fake} use_soem:={use_soem} \
                             control_mode:={control_mode} enable_interaction:={enable_interaction} \
+                            world:={world_path} \
                             move_group_demo:=api"
                         
                         print_flush(f"Starting Cobot Backend in {mode} mode...")
@@ -150,16 +162,16 @@ class MySubscriber(Node):
                         
                         print_flush(f"holding action: {type} with value wrench: force: x: {fx}, y: {fy}, z: {fz}")
 
-                        # Use 'ign topic' with /persistent to ensure the force stays active and visible
+                        # Use 'ign topic' without /persistent to ensure the force is an impulse
                         # We use 'cobot_arm::link_6' because Gazebo namespaces spawned links.
                         ign_cmd = (
-                            f"ign topic -t \"/world/empty/wrench/persistent\" -m ignition.msgs.EntityWrench "
+                            f"ign topic -t \"/world/empty/wrench\" -m ignition.msgs.EntityWrench "
                             f"-p \"entity: {{name: 'cobot_arm::link_6', type: LINK}}, "
                             f"wrench: {{force: {{x: {fx}, y: {fy}, z: {fz}}}, "
                             f"torque: {{x: {tx}, y: {ty}, z: {tz}}}}}\""
                         )
                         subprocess.Popen(ign_cmd, shell=True, executable="/bin/bash")
-                        print_flush(f"Persistent wrench applied via ign: F[{fx},{fy},{fz}]")
+                        print_flush(f"Impulse wrench applied via ign: F[{fx},{fy},{fz}]")
         except Exception as e:
             print_flush(f"Error in command processing: {e}")
 

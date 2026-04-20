@@ -41,6 +41,7 @@ def launch_setup(context, *args, **kwargs):
     move_group_demo = LaunchConfiguration("move_group_demo")
     move_group_demo = context.perform_substitution(move_group_demo)
     world = LaunchConfiguration("world")
+    world_path = context.perform_substitution(world)
     sim_gazebo = LaunchConfiguration("sim_gazebo")
     sim_gazebo_val = context.perform_substitution(sim_gazebo)
     use_fake_hardware = LaunchConfiguration("use_fake_hardware")
@@ -80,12 +81,13 @@ def launch_setup(context, *args, **kwargs):
     # ------------ IGNITION GAZEBO
     # Ignition Gazebo Launch
     
-    # Mesh resolution fix
+    # Mesh resolution and world fix
     # Add both the package share and the directory above it to GZ paths
     pkg_share_path = get_package_share_directory("cobot_description")
-    parent_share_path = os.path.join(pkg_share_path, '..')
+    parent_share_path = os.path.dirname(pkg_share_path) # install/cobot_description/share
+    world_pkg_path = os.path.join(pkg_share_path, "worlds")
     
-    resource_paths = [pkg_share_path, parent_share_path]
+    resource_paths = [pkg_share_path, parent_share_path, world_pkg_path]
     resource_env = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=[':'.join(resource_paths)]
@@ -95,11 +97,16 @@ def launch_setup(context, *args, **kwargs):
         value=[':'.join(resource_paths)]
     )
 
+    # Note: gz_args must be a single string for ros_gz_sim
+    # We use -s (server-only) because we are in a headless container
+    # We ensure the world path is absolute to prevent 'Fuel world' download issues
+    gz_args_str = [world_path, ' -r -v 4 -s']
+
     gazebo_server = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]
         ),
-        launch_arguments=[('gz_args', ['-r -v 4 ', world])]
+        launch_arguments=[('gz_args', gz_args_str)]
     )
 
     gazebo_nodes = []

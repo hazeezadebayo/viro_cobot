@@ -10,7 +10,7 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node
 from launch.actions import Shutdown, DeclareLaunchArgument
-from launch.conditions import UnlessCondition, LaunchConfigurationEquals
+from launch.conditions import UnlessCondition, LaunchConfigurationEquals, IfCondition
 
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import TimerAction
@@ -35,6 +35,11 @@ def generate_launch_description():
         default_value='false',
         description='Use SOEM hardware driver'
     )
+    use_modular_hardware_arg = DeclareLaunchArgument(
+        'use_modular_hardware',
+        default_value='false',
+        description='Use Viro Modular Serial Hardware'
+    )
 
     robot_name_arg = DeclareLaunchArgument(
         'robot_name',
@@ -52,14 +57,13 @@ def generate_launch_description():
     sim_gazebo = LaunchConfiguration('sim_gazebo')
     use_fake_hardware = LaunchConfiguration('use_fake_hardware')
     use_soem = LaunchConfiguration('use_soem')
+    use_modular_hardware = LaunchConfiguration('use_modular_hardware')
     robot_name = LaunchConfiguration('robot_name')
     control_mode = LaunchConfiguration('control_mode')
 
     # Map control_mode to mode_of_operation
     # Position: 8, Torque(Effort): 10
-    mode_of_operation = PythonExpression([
-        "'10' if '", control_mode, "' == 'effort' else '8'"
-    ])
+    mode_of_operation = PythonExpression(["'10' if '", control_mode, "' == 'effort' else '8'"])
 
     # package paths
     pkg_share_path = get_package_share_directory("cobot_description")
@@ -141,6 +145,25 @@ def generate_launch_description():
         "pseudo_soem_config.yaml", # "soem_config.yaml",
     )
 
+    wrist_ft_sensor_broadcaster_spawner = TimerAction(
+        period=3.0,
+        actions=[
+            Node(
+                name="wrist_ft_sensor_broadcaster_spawner",
+                package="controller_manager",
+                executable="spawner",
+                output="screen",
+                parameters=[{"use_sim_time": sim_gazebo}],
+                arguments=[
+                    "wrist_ft_sensor_broadcaster",
+                    "--controller-manager",
+                    "/controller_manager"       
+                ],
+                condition=IfCondition(use_modular_hardware)
+            )
+        ]
+    )
+
     # ROS 2 CONTROL ----------------------------------------------------------
     robot_description_config = Command(
         [FindExecutable(name='xacro'),
@@ -155,6 +178,8 @@ def generate_launch_description():
          sim_gazebo,
          ' use_soem:=',
          use_soem,
+         ' use_modular_hardware:=',
+         use_modular_hardware,
          ' initial_mode_of_operation:=',
          mode_of_operation])
     robot_description = {'robot_description': robot_description_config}
@@ -191,6 +216,7 @@ def generate_launch_description():
             sim_gazebo_arg,
             use_fake_hardware_arg,
             use_soem_arg,
+            use_modular_hardware_arg,
             robot_name_arg,
             control_mode_arg,
 
@@ -200,5 +226,6 @@ def generate_launch_description():
             joint_state_broadcaster,
             joint_trajectory_controller,
             gripper_controller_spawner,
+            wrist_ft_sensor_broadcaster_spawner,
         ]
     )

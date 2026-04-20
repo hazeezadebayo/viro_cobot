@@ -23,6 +23,14 @@ def generate_launch_description():
         description='Simulation in Gazebo'
     )
 
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value=PathJoinSubstitution(
+            [FindPackageShare("cobot_description"), "worlds", "empty.world"]
+        ),
+        description='Full path to Gazebo world file'
+    )
+
     use_fake_hardware_arg = DeclareLaunchArgument(
         'use_fake_hardware',
         default_value='false',
@@ -54,6 +62,7 @@ def generate_launch_description():
     move_group_demo = LaunchConfiguration('move_group_demo')
     control_mode = LaunchConfiguration('control_mode')
     enable_interaction = LaunchConfiguration('enable_interaction')
+    world = LaunchConfiguration('world')
 
     # Define the 'start_controller' launch
     start_controller_launch = IncludeLaunchDescription(
@@ -92,12 +101,14 @@ def generate_launch_description():
             ("use_soem", use_soem),
             ("enable_interaction", enable_interaction),
             ("control_mode", control_mode),
+            ("world", world),
         ],
     )
 
     return LaunchDescription([
         move_group_demo_arg,
         sim_gazebo_arg,
+        world_arg,
         use_fake_hardware_arg,
         use_soem_arg,
         control_mode_arg,

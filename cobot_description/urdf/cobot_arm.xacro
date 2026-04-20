@@ -242,12 +242,15 @@
 
 
 
+        <!-- Legacy TCP (Commented out to prevent conflict with gripper_tcp) -->
+        <!--
         <joint name="eef_tcp" type="fixed">
             <parent link="link_6" />
             <child link="eef_tcp_link" />
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.1 0.0"/>
         </joint>
         <link name="eef_tcp_link" />
+        -->
 
     </xacro:macro>
 

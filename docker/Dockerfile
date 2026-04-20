@@ -16,10 +16,10 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     gnupg2 \
     iproute2 \
-    xterm \
     autoconf \
     autogen \
     libtool \
+    libserial-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Build and Install IgH EtherCAT Master (Userspace Libraries only)
